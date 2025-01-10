@@ -9,10 +9,12 @@ import Octicons from "@expo/vector-icons/Octicons";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "react-native";
+import { useRouter } from "expo-router";
 
 export default function Index() {
   const [todos, setTodos] = useState([]);
   const [text, setText] = useState("");
+  const router = useRouter();
   const { colorScheme, setColorScheme, theme } = useContext(ThemeContext);
   const [loaded, error] = useFonts({ Inter_500Medium });
 
@@ -62,7 +64,7 @@ export default function Index() {
     }
   };
 
-  const toggleTodo = (id: number) => {
+  const toggleTodo = (id) => {
     setTodos(
       todos.map((todo) => {
         return todo.id === id ? { ...todo, completed: !todo.completed } : todo;
@@ -70,19 +72,27 @@ export default function Index() {
     );
   };
 
-  const removeTodo = (id: number) => {
+  const removeTodo = (id) => {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
 
-  const renderItem = ({ item }: any) => {
+  const handlePress = (id) => {
+    router.push(`/todos/${id}`);
+  };
+
+  const renderItem = ({ item }) => {
     return (
       <View style={styles.todoItem}>
-        <Text
-          style={[styles.todoText, item.completed && styles.completedText]}
-          onPress={() => toggleTodo(item.id)}
+        <Pressable
+          onPress={() => handlePress(item.id)}
+          onLongPress={() => toggleTodo(item.id)}
         >
-          {item.title}
-        </Text>
+          <Text
+            style={[styles.todoText, item.completed && styles.completedText]}
+          >
+            {item.title}
+          </Text>
+        </Pressable>
         <Pressable onPress={() => removeTodo(item.id)}>
           <MaterialCommunityIcons
             name="delete-circle"
